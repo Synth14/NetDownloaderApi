@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using NetDownloaderApi.Interfaces;
+using NetDownloaderApi.Models;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace NetDownloaderApi.Controllers
@@ -10,10 +12,13 @@ namespace NetDownloaderApi.Controllers
     public class DownloadController : ControllerBase
     {
         private readonly IDownloadService _downloadService;
+        private readonly IOptions<DownloadConfiguration> _downloadConfiguration;
 
-        public DownloadController(IDownloadService downloadService)
+
+        public DownloadController(IDownloadService downloadService, IOptions<DownloadConfiguration> downloadConfiguration)
         {
-            this._downloadService = downloadService;
+            _downloadService = downloadService;
+            _downloadConfiguration = downloadConfiguration;
         }
 
         [ApiVersion("1")]
@@ -38,15 +43,24 @@ namespace NetDownloaderApi.Controllers
 
             try
             {
-                var memoryStream = await _downloadService.DownloadLargeFileAsync(link);
+                await _downloadService.DownloadLargeFileAsync(link);
+                var appDirectory = AppContext.BaseDirectory;
+                var downloadPath = Path.Combine(appDirectory, "Downloads");
 
-                // Set the response headers
-                var fileName = "largefile.mkv"; // Specify the desired file name
+                // Check if the directory exists, and create it if not
+                if (!Directory.Exists(downloadPath))
+                {
+                    Directory.CreateDirectory(downloadPath);
+                }
+
+                var filePath = Path.Combine(downloadPath, "largefile.mkv");
+
+                // Set the response headers// Specify the desired file name
                 var contentType = "application/octet-stream"; // Set the appropriate content type
 
                 // Rewind the MemoryStream to the beginning
-
-                return File(memoryStream, contentType, fileName);
+                var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                return File(fileStream, contentType, filePath);
             }
             catch (Exception ex)
             {
@@ -54,6 +68,45 @@ namespace NetDownloaderApi.Controllers
                 return BadRequest($"Error: {ex.Message}");
             }
         }
+        [HttpGet("api/files")]
+        public async Task<IActionResult> DownloadFile([FromQuery] string fileUrl)
+        {
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    using (var response = await httpClient.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead))
+                    {
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var stream = await response.Content.ReadAsStreamAsync();
+                            var contentType = response.Content.Headers.ContentType?.ToString();
+
+                            // Specify the path where you want to save the file locally
+                            var localFilePath = _downloadConfiguration.Value.DownloadPath +"\\pouet2.mkv"; // Replace with your desired path
+
+                            using (var fileStream = System.IO.File.Create(localFilePath))
+                            {
+                                await stream.CopyToAsync(fileStream);
+                            }
+
+                            // Now, you can return the file from the local path if needed
+                            return File(System.IO.File.OpenRead(localFilePath), contentType);
+                        }
+                        else
+                        {
+                            return NotFound();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions, e.g., if the URL is invalid or the download fails.
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 
 }

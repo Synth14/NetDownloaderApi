@@ -2,9 +2,9 @@ using NetDownloaderApi.Controllers;
 using NetDownloaderApi.Interfaces;
 using NetDownloaderApi.Models;
 using NetDownloaderApi.Services;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -15,10 +15,11 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<IDownloadService, DownloadService>();
 
 builder.Services.AddSingleton<DownloadConfiguration>();
-builder.Services.AddOptions(); 
+builder.Services.AddOptions();
+builder.Configuration.AddJsonFile("appsettings.json");
+
 builder.Services.Configure<DownloadConfiguration>(builder.Configuration.GetSection("DownloadConfiguration"));
 
-builder.Configuration.AddJsonFile("appsettings.json");
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
