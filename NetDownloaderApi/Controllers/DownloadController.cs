@@ -79,15 +79,21 @@ namespace NetDownloaderApi.Controllers
                     {
                         if (response.IsSuccessStatusCode)
                         {
-                            var stream = await response.Content.ReadAsStreamAsync();
                             var contentType = response.Content.Headers.ContentType?.ToString();
 
-                            // Specify the path where you want to save the file locally
-                            var localFilePath = _downloadConfiguration.Value.DownloadPath +"\\pouet2.mkv"; // Replace with your desired path
-
+                            var localFilePath = _downloadConfiguration.Value.DownloadPath+"\\pouet3.mkv"; // Replace with your desired path
                             using (var fileStream = System.IO.File.Create(localFilePath))
                             {
-                                await stream.CopyToAsync(fileStream);
+                                var stream = await response.Content.ReadAsStreamAsync();
+                                var buffer = new byte[8192]; // 8KB buffer (you can adjust this size)
+                                var bytesRead = 0;
+
+                                while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                                {
+                                    await fileStream.WriteAsync(buffer, 0, bytesRead);
+                                    await fileStream.FlushAsync(); // Flush the buffer to disk
+
+                                }
                             }
 
                             // Now, you can return the file from the local path if needed
