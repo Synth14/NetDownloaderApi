@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NetDownloaderApi.Interfaces;
 using NetDownloaderApi.Models;
+using NetDownloaderApi.Tools;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace NetDownloaderApi.Controllers
@@ -73,6 +74,9 @@ namespace NetDownloaderApi.Controllers
         {
             try
             {
+                // Generate a unique temporary file name
+                var tempFilePath = Path.Combine(_downloadConfiguration.Value.DownloadPath+"\\", Guid.NewGuid().ToString() + ".crdownload");
+
                 using (var httpClient = new HttpClient())
                 {
                     using (var response = await httpClient.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead))
@@ -81,26 +85,31 @@ namespace NetDownloaderApi.Controllers
                         {
                             var contentType = response.Content.Headers.ContentType?.ToString();
 
-                            var localFilePath = _downloadConfiguration.Value.DownloadPath+"\\pouet3.mkv"; // Replace with your desired path
-                            using (var fileStream = System.IO.File.Create(localFilePath))
+                            using (var fileStream = System.IO.File.Create(tempFilePath))
                             {
-                                var stream = await response.Content.ReadAsStreamAsync();
                                 var buffer = new byte[8192]; // 8KB buffer (you can adjust this size)
                                 var bytesRead = 0;
 
-                                while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                                using (var responseStream = await response.Content.ReadAsStreamAsync())
                                 {
-                                    await fileStream.WriteAsync(buffer, 0, bytesRead);
-                                    await fileStream.FlushAsync(); // Flush the buffer to disk
-
+                                    while ((bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                                    {
+                                        await fileStream.WriteAsync(buffer, 0, bytesRead);
+                                    }
                                 }
                             }
 
-                            // Now, you can return the file from the local path if needed
-                            return File(System.IO.File.OpenRead(localFilePath), contentType);
+                            // Rename the temporary file to remove .crdownload extension
+                            var finalFilePath = Path.Combine(_downloadConfiguration.Value.DownloadPath, "\\trucr.mkv"); // Adjust the final file path and extension
+                            System.IO.File.Move(tempFilePath, finalFilePath);
+
+                            // Now, you can return the file from the final path
+                            return File(System.IO.File.OpenRead(finalFilePath), contentType);
                         }
                         else
                         {
+                            // Handle download failure, possibly clean up the temporary file
+                            System.IO.File.Delete(tempFilePath);
                             return NotFound();
                         }
                     }
@@ -112,7 +121,79 @@ namespace NetDownloaderApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("api/files2")]
 
+        public async Task<IActionResult> DownloadFilez([FromQuery] string fileUrl)
+        {
+            try
+            {
+                var fileType = await FileSerializer.IdentifyFileType(fileUrl);
+
+                var finalFileName = await FileSerializer.GetOrCreateFileName(fileUrl);
+                using (var httpClient = new HttpClient())
+                {
+                    using (var response = await httpClient.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead))
+                    {
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var contentType = response.Content.Headers.ContentType?.ToString();
+
+                            var tempFileName = Guid.NewGuid().ToString();
+                            // Create a unique temporary file with the extracted or default filename
+                            var tempFilePath = Path.Combine(_downloadConfiguration.Value.DownloadPath, tempFileName);
+
+                            using (var fileStream = System.IO.File.Create(tempFilePath))
+                            {
+                                var buffer = new byte[8192]; // 8KB buffer
+                                var bytesRead = 0;
+
+                                using (var responseStream = await response.Content.ReadAsStreamAsync())
+                                {
+                                    while ((bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                                    {
+                                        await fileStream.WriteAsync(buffer, 0, bytesRead);
+                                    }
+                                }
+                            }
+
+                            // Rename the temporary file to remove .crdownload extension
+                            var finalFilePath = Path.Combine(_downloadConfiguration.Value.DownloadPath, tempFileName); // Adjust the final file path
+
+                            // Ensure the final directory exists, create it if necessary
+                            var finalDirectory = Path.GetDirectoryName(finalFilePath);
+                            if (!Directory.Exists(finalDirectory))
+                            {
+                                Directory.CreateDirectory(finalDirectory);
+                            }
+                            if(tempFilePath != finalFilePath) 
+                                System.IO.File.Move(tempFilePath, finalFilePath);
+
+                            if (System.IO.File.Exists(finalFilePath))
+                            {
+                                // Now, you can return the file from the final path
+                                return File(System.IO.File.OpenRead(finalFilePath), contentType, tempFileName);
+                            }
+                            else
+                            {
+                                // Handle renaming failure
+                                System.IO.File.Delete(tempFilePath);
+                                return NotFound("Failed to rename the file.");
+                            }
+                        }
+                        else
+                        {
+                            // Handle download failure
+                            return NotFound();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions, e.g., if the URL is invalid or the download fails.
+                return BadRequest(ex.Message);
+            }
+        }
     }
 
 }
