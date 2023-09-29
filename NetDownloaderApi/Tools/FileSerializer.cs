@@ -105,7 +105,7 @@ namespace NetDownloaderApi.Tools
 
                             }
                             
-                            fileType.contentType = string.IsNullOrEmpty(fileType.contentType)? (FileContentTypes.ContainsKey(fileType.fileExtension) ? FileContentTypes[fileType.fileExtension] : "unknown/unknown"): "unknown/unknown";
+                            fileType.contentType = string.IsNullOrEmpty(fileType.contentType)? (FileContentTypes.ContainsKey(fileType.fileExtension) ? FileContentTypes[fileType.fileExtension] : "unknown/unknown"): fileType.contentType;
 
                             return fileType;
                         }
