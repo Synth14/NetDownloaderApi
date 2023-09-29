@@ -4,7 +4,6 @@ namespace NetDownloaderApi.Interfaces
 {
     public interface IDownloadService
     {
-        Task DownloadAsync(string link);
-        Task DownloadLargeFileAsync(string link);
+        Task<string> DownloadLargeFileAsync(string link, string fileName);
     }
 }

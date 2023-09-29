@@ -1,5 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.FileSystemGlobbing.Internal;
+using NetDownloaderApi.Models;
+using System;
 using System.Net.Http.Headers;
+using System.Net.Mime;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace NetDownloaderApi.Tools
 {
@@ -34,7 +39,7 @@ namespace NetDownloaderApi.Tools
 
                         fileName = SanitizeFileName(fileName);
 
-                        if (!Path.HasExtension(fileName))
+                        if (!Path.HasExtension(fileName)) //peut être move ça dans le controller et l'ajouter à l'identifyFileType, arf
                         {
                             MediaTypeHeaderValue contentType = contentHeaders.ContentType;
                             if (contentType.MediaType != null)
@@ -43,7 +48,7 @@ namespace NetDownloaderApi.Tools
 
                                 if (!string.IsNullOrEmpty(fileExtension))
                                 {
-                                    return fileName + "." + fileExtension; // Vous pouvez personnaliser la logique de nommage ici
+                                    return fileName + "." + fileExtension; 
                                 }
                             }
                         }
@@ -67,19 +72,16 @@ namespace NetDownloaderApi.Tools
             fileName?.Replace("_", ".");
             return fileName?.Replace(" ", ".");
         }
-        public static async Task<string> IdentifyFileType(string url)
+        public static async Task<FileType> IdentifyFileType(string url)
         {
             using (HttpClient httpClient = new HttpClient(new HttpClientHandler() { MaxRequestContentBufferSize = 104857600 }))
             {
-
+                FileType fileType = new();
                 try
                 {
-                    // Create an HTTP request to retrieve the first few bytes (e.g., 0-7).
                     var rangeRequest = new HttpRequestMessage(HttpMethod.Get, url);
-                    rangeRequest.Headers.Range = new RangeHeaderValue(0, 7); // Adjust the range as needed.
+                    rangeRequest.Headers.Range = new RangeHeaderValue(0, 7);
 
-                    // Send the request and get the response.
-                    //HttpResponseMessage response = httpClient.SendAsync(rangeRequest, HttpCompletionOption.ResponseHeadersRead).Result; //worked, but not async
                     HttpResponseMessage response = await httpClient.SendAsync(rangeRequest, HttpCompletionOption.ResponseHeadersRead);
 
 
@@ -92,7 +94,20 @@ namespace NetDownloaderApi.Tools
 
                         if (FileTypeSignatures.ContainsKey(signatureHex))
                         {
-                            return FileTypeSignatures[signatureHex];
+                            fileType.fileExtension = FileTypeSignatures[signatureHex];
+                        }
+                        if (contentHeaders.TryGetValues("Content-Type", out IEnumerable<string> contentTypeValues))
+                        {
+                            string pattern = @"^[a-zA-Z0-9!#$&+.\-^_]+/[a-zA-Z0-9!#$&+.\-^_]+$";
+                            if (Regex.IsMatch(contentTypeValues?.FirstOrDefault(), pattern))
+                            {
+                                fileType.contentType = contentTypeValues?.FirstOrDefault();
+
+                            }
+                            
+                            fileType.contentType = string.IsNullOrEmpty(fileType.contentType)? (FileContentTypes.ContainsKey(fileType.fileExtension) ? FileContentTypes[fileType.fileExtension] : "unknown/unknown"): "unknown/unknown";
+
+                            return fileType;
                         }
                     }
                     else
@@ -105,16 +120,10 @@ namespace NetDownloaderApi.Tools
                     Console.WriteLine($"Erreur de requête HTTP : {ex.Message}");
                 }
 
-                return "unknown"; // If the file type can't be determined.
-
-
+                return new FileType{ fileExtension = ".unknown",contentType="" }; // If the file type can't be determined.
             }
         }
 
-        static byte[] ReadFirstBytes(byte[] bytes, int count)
-        {
-            return bytes.Take(count).ToArray();
-        }
         static Dictionary<string, string> FileTypeSignatures = new Dictionary<string, string>
         {
             { "25504446", "pdf" },   // PDF file signature
@@ -122,6 +131,7 @@ namespace NetDownloaderApi.Tools
             { "52657420", "txt" },   // Plain Text file signature
             { "47494638", "gif" },   // GIF file signature
             { "89504E47", "png" },   // PNG file signature
+            { "52617221", "rar" },
             { "FFD8FFE0", "jpg" },   // JPEG (start of image)
             { "FFD8FFE1", "jpg" },   // JPEG (start of image)
             { "FFD8FFE8", "jpg" },   // JPEG (start of image)
@@ -151,6 +161,29 @@ namespace NetDownloaderApi.Tools
             { "6D6F6F76", "mov" }, // QuickTime Movie (MOV) file signature
             { "252150532D41646F6265", "eps" }, // Encapsulated PostScript (EPS) file signature
         };
+        static Dictionary<string, string> FileContentTypes = new Dictionary<string, string> //methode de sauvageon pour l'instant
+        {
+            { "txt", "text/plain" },
+            { "html", "text/html" },
+            { "htm", "text/html" },
+            { "xml", "text/xml" },
+            { "jpeg", "image/jpeg" },
+            { "jpg", "image/jpeg" },
+            { "png", "image/png" },
+            { "gif", "image/gif" },
+            { "mp3", "audio/mpeg" },
+            { "mp4", "video/mp4" },
+            { "pdf", "application/pdf" },
+            { "doc", "application/msword" },
+            { "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+            { "xls", "application/vnd.ms-excel" },
+            { "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+            { "zip", "application/zip" },
+            { "rar", "application/x-rar-compressed" },
+            { "json", "application/json" },
+            { "js", "application/javascript" }
+        };
+
     }
 
 }
