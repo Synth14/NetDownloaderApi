@@ -84,7 +84,6 @@ namespace NetDownloaderApi.Tools
 
                     HttpResponseMessage response = await httpClient.SendAsync(rangeRequest, HttpCompletionOption.ResponseHeadersRead);
 
-
                     if (response.IsSuccessStatusCode)
                     {
                         var contentHeaders = response.Content.Headers;
@@ -102,7 +101,6 @@ namespace NetDownloaderApi.Tools
                             if (Regex.IsMatch(contentTypeValues?.FirstOrDefault(), pattern))
                             {
                                 fileType.contentType = contentTypeValues?.FirstOrDefault();
-
                             }
                             
                             fileType.contentType = string.IsNullOrEmpty(fileType.contentType)? (FileContentTypes.ContainsKey(fileType.fileExtension) ? FileContentTypes[fileType.fileExtension] : "unknown/unknown"): fileType.contentType;

@@ -1,16 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using NetDownloaderApi.Interfaces;
 using NetDownloaderApi.Models;
-using System.Text.RegularExpressions;
-using Microsoft.Extensions.FileSystemGlobbing;
-using System.Net.Http.Headers;
-using Microsoft.AspNetCore.Mvc;
 
 namespace NetDownloaderApi.Services
 {
