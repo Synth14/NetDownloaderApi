@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using NetDownloader.Entity.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
+using NetDownloader.Entity.Services;
+using NetDownloader.Entity.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -16,6 +18,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IDownloadService, DownloadService>();
+builder.Services.AddScoped<ILinksService, LinksService>();
+builder.Services.AddScoped<IHostsService, HostsService>();
+builder.Services.AddScoped<ITagsService, TagsService>();
+builder.Services.AddScoped<IAccountsService,AccountsService>();
+
+
 
 builder.Services.AddSingleton<DownloadConfiguration>();
 builder.Services.AddOptions();

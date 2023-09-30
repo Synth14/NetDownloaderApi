@@ -5,7 +5,7 @@ using NetDownloader.Entity.Models;
 
 namespace NetDownloader.Entity.Services
 {
-    public class HostsService : ILinksController
+    public class HostsService : IHostsService
     {
         private readonly ApplicationDbContext _context;
 

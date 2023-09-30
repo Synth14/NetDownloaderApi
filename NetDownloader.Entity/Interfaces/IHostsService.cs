@@ -2,7 +2,7 @@
 
 namespace NetDownloader.Entity.Interfaces
 {
-    public interface ILinksController
+    public interface IHostsService
     {
         Task CreateHostsAsync(Hosts Hosts);
         Task DeleteHostsAsync(int id);
