@@ -6,10 +6,11 @@ namespace NetDownloader.Entity.Models
     public class Hosts
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int HostId { get; set; }
         public string Hostname { get; set; }
         [ForeignKey(nameof(Accounts.AccountId))]
-        public string AccountId { get; set; }
+        public int AccountId { get; set; }
 
         public Accounts Account { get; set; }
     }

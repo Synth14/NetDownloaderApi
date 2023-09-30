@@ -4,7 +4,7 @@ namespace NetDownloader.Entity.Services
 {
     public interface ITagsService
     {
-        Task CreateTagsAsync(Hosts Hosts);
+        Task CreateTagsAsync(Tags tags);
         Task DeleteTagsAsync(int id);
         Task<IEnumerable<Tags>> GetAllTagsAsync();
         Task<Tags> GetTagsByIdAsync(int id);

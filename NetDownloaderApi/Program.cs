@@ -1,13 +1,12 @@
-using NetDownloaderApi.Controllers;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using NetDownloader.Entity.Context;
+using NetDownloader.Entity.Interfaces;
+using NetDownloader.Entity.Services;
 using NetDownloaderApi.Interfaces;
 using NetDownloaderApi.Models;
 using NetDownloaderApi.Services;
-using Microsoft.Extensions.Configuration;
-using NetDownloader.Entity.Context;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Hosting;
-using NetDownloader.Entity.Services;
-using NetDownloader.Entity.Interfaces;
+
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -22,8 +21,9 @@ builder.Services.AddScoped<ILinksService, LinksService>();
 builder.Services.AddScoped<IHostsService, HostsService>();
 builder.Services.AddScoped<ITagsService, TagsService>();
 builder.Services.AddScoped<IAccountsService,AccountsService>();
-
-
+builder.Services.AddControllersWithViews();
+builder.Services.AddMvc().AddCookieTempDataProvider();
+builder.Services.AddMvc().AddSessionStateTempDataProvider();
 
 builder.Services.AddSingleton<DownloadConfiguration>();
 builder.Services.AddOptions();

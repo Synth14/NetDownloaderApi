@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using NetDownloader.Entity.Models;
 using NetDownloader.Entity.Services;
+using Swashbuckle.AspNetCore;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace NetDownloader.Entity.Controllers
 {
@@ -12,17 +15,15 @@ namespace NetDownloader.Entity.Controllers
         {
             _linksService = linksService;
         }
+        [ApiVersion("1")]
+        [HttpPost("Createlink")]
+        [SwaggerOperation(Summary = "Download a file from a URL", Description = "Downloads the file at the specified URL to the client's machine.")]
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("HostId,Hostname,AccountId")] Hosts host)
         {
-            if (ModelState.IsValid)
-            {
                 await _linksService.CreateLinksAsync(host);
                 return RedirectToAction(nameof(Index));
-            }
-            return View(host);
+            
         }
     }
 }

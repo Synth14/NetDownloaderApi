@@ -23,9 +23,9 @@ namespace NetDownloader.Entity.Services
             return await _context.TagItems.FirstOrDefaultAsync(m => m.TagId == id);
         }
 
-        public async Task CreateTagsAsync(Hosts Hosts)
+        public async Task CreateTagsAsync(Tags tags)
         {
-            _context.Add(Hosts);
+            _context.Add(tags);
             await _context.SaveChangesAsync();
         }
 
