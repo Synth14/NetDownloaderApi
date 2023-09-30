@@ -4,7 +4,7 @@ using NetDownloader.Entity.Models;
 
 namespace NetDownloader.Entity.Services
 {
-    public class LinksService
+    public class LinksService : ILinksService
     {
         private readonly ApplicationDbContext _context;
 
@@ -20,7 +20,7 @@ namespace NetDownloader.Entity.Services
 
         public async Task<Links> GetLinksByIdAsync(int id)
         {
-            return await _context.LinkItems.FirstOrDefaultAsync(m => m.LinksId== id);
+            return await _context.LinkItems.FirstOrDefaultAsync(m => m.LinksId == id);
         }
 
         public async Task CreateLinksAsync(Hosts Hosts)

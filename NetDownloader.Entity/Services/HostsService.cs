@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NetDownloader.Entity.Context;
+using NetDownloader.Entity.Interfaces;
 using NetDownloader.Entity.Models;
 
 namespace NetDownloader.Entity.Services
 {
-    public class HostsService
+    public class HostsService : ILinksController
     {
         private readonly ApplicationDbContext _context;
 

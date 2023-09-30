@@ -4,7 +4,7 @@ using NetDownloader.Entity.Models;
 
 namespace NetDownloader.Entity.Services
 {
-    public class TagsService
+    public class TagsService : ITagsService
     {
         private readonly ApplicationDbContext _context;
 
