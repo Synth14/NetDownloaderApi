@@ -5,7 +5,7 @@ namespace NetDownloader.Entity.Models
     public class Accounts
     {
         [Key]
-        public string AccountId { get; set; }
+        public int AccountId { get; set; }
         public string AccountName { get; set; }
         public byte[] PasswordHash { get; set; }
         public byte[] Salt { get; set; }
