@@ -11,12 +11,13 @@ namespace NetDownloader.Entity.Models
         [Key]
         public int LinksId { get; set; }
         public string Url { get; set; }
-        [ForeignKey("Host")]
+        [ForeignKey(nameof(Hosts.HostId))]
         public int HostId { get; set; }
-        [ForeignKey("Tag")]
+        [ForeignKey(nameof(Tags.TagId))]
+
         public int TagId { get; set; }
 
-        public Host Host { get; set; }
-        public Tag Tag { get; set; }
+        public Hosts Host { get; set; }
+        public Tags Tag { get; set; }
     }
 }
