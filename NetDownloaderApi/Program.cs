@@ -3,6 +3,9 @@ using NetDownloaderApi.Interfaces;
 using NetDownloaderApi.Models;
 using NetDownloaderApi.Services;
 using Microsoft.Extensions.Configuration;
+using NetDownloader.Entity.Context;
+using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -17,7 +20,7 @@ builder.Services.AddScoped<IDownloadService, DownloadService>();
 builder.Services.AddSingleton<DownloadConfiguration>();
 builder.Services.AddOptions();
 builder.Configuration.AddJsonFile("appsettings.json");
-
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.Configure<DownloadConfiguration>(builder.Configuration.GetSection("DownloadConfiguration"));
 
 var app = builder.Build();

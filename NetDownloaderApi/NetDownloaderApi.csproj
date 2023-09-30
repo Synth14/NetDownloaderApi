@@ -20,4 +20,8 @@
     <PackageReference Include="System.Text.Json" Version="7.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\NetDownloader.Entity\NetDownloader.Entity.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using NetDownloaderApi.Interfaces;
-using NetDownloaderApi.Models;
 using NetDownloaderApi.Tools;
 using Swashbuckle.AspNetCore.Annotations;
+
 
 namespace NetDownloaderApi.Controllers
 {
@@ -31,7 +30,7 @@ namespace NetDownloaderApi.Controllers
             try
             {
 
-                var fileType = await FileSerializer.IdentifyFileType(fileUrl);
+                var fileType = await FileSerializer.IdentifyFileType(fileUrl);//will probably used after the clipboard crawler got a link
                 var finalFileName = await FileSerializer.GetOrCreateFileName(fileUrl);
                 var downloadedFilePath = await _downloadService.DownloadLargeFileAsync(fileUrl, finalFileName);
 
