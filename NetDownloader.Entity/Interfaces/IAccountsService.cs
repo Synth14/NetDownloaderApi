@@ -4,10 +4,10 @@ namespace NetDownloader.Entity.Interfaces
 {
     public interface IAccountsService
     {
-        Task CreateAccountsAsync(Hosts Hosts);
-        Task DeleteAccountsAsync(int id);
-        Task<Accounts> GetAccountsByIdAsync(int id);
+        Task<bool> CreateAccountAsync(Accounts account);
+        Task<bool> DeleteAccountByIdAsync(int id);
+        Task<Accounts> GetAccountByIdAsync(int id);
         Task<IEnumerable<Accounts>> GetAllAccountsAsync();
-        Task UpdateAccountsAsync(Hosts Hosts);
+        Task<bool> UpdateAccountAsync(Accounts account);
     }
 }

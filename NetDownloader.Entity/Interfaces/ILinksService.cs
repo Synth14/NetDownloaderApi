@@ -4,10 +4,10 @@ namespace NetDownloader.Entity.Services
 {
     public interface ILinksService
     {
-        Task CreateLinksAsync(Hosts Hosts);
-        Task DeleteLinksAsync(int id);
+        Task<bool> CreateLinkAsync(Links link);
+        Task<bool> DeleteLinkAsync(int id);
         Task<IEnumerable<Links>> GetAllLinksAsync();
-        Task<Links> GetLinksByIdAsync(int id);
-        Task UpdateLinksAsync(Hosts Hosts);
+        Task<Links> GetLinkByIdAsync(int id);
+        Task<bool> UpdateLinkAsync(Links link);
     }
 }

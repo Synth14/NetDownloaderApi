@@ -23,23 +23,26 @@ namespace NetDownloader.Entity.Services
             return await _context.TagItems.FirstOrDefaultAsync(m => m.TagId == id);
         }
 
-        public async Task CreateTagsAsync(Tags tags)
+        public async Task<bool> CreateTagsAsync(Tags tags)
         {
-            _context.Add(tags);
-            await _context.SaveChangesAsync();
+            _context.TagItems.Add(tags);
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
         }
 
-        public async Task UpdateTagsAsync(Hosts Hosts)
+        public async Task<bool> UpdateTagAsync(Tags tags)
         {
-            _context.Update(Hosts);
-            await _context.SaveChangesAsync();
+            _context.Update(tags);
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
         }
 
-        public async Task DeleteTagsAsync(int id)
+        public async Task<bool> DeleteTagByIdAsync(int id)
         {
             var tags = await _context.TagItems.FindAsync(id);
             _context.TagItems.Remove(tags);
-            await _context.SaveChangesAsync();
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
         }
     }
 }

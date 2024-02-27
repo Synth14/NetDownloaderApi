@@ -13,20 +13,22 @@ namespace NetDownloader.Entity.Services
         {
             _context = context;
         }
-        public async Task CreateAccountsAsync(Hosts Hosts)
+        public async Task<bool> CreateAccountAsync(Accounts account)
         {
-            _context.Add(Hosts);
-            await _context.SaveChangesAsync();
+            _context.Add(account);
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
         }
 
-        public async Task DeleteAccountsAsync(int id)
+        public async Task<bool> DeleteAccountByIdAsync(int id)
         {
             var accounts = await _context.AccountItems.FindAsync(id);
             _context.AccountItems.Remove(accounts);
-            await _context.SaveChangesAsync();
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
         }
 
-        public async Task<Accounts> GetAccountsByIdAsync(int id)
+        public async Task<Accounts> GetAccountByIdAsync(int id)
         {
             return await _context.AccountItems.FirstOrDefaultAsync(m => m.AccountId == id);
         }
@@ -36,10 +38,11 @@ namespace NetDownloader.Entity.Services
             return await _context.AccountItems.ToListAsync();
         }
 
-        public async Task UpdateAccountsAsync(Hosts Hosts)
+        public async Task<bool> UpdateAccountAsync(Accounts account)
         {
-            _context.Update(Hosts);
-            await _context.SaveChangesAsync();
+            _context.Update(account);
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
         }
     }
 }

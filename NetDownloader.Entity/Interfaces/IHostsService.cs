@@ -4,10 +4,10 @@ namespace NetDownloader.Entity.Interfaces
 {
     public interface IHostsService
     {
-        Task CreateHostsAsync(Hosts Hosts);
-        Task DeleteHostsAsync(int id);
+        Task<bool> CreateHostAsync(Hosts Hosts);
+        Task<bool> DeleteHostByIdAsync(int id);
         Task<IEnumerable<Hosts>> GetAllHostsAsync();
-        Task<Hosts> GetHostsByIdAsync(int id);
-        Task UpdateHostsAsync(Hosts Hosts);
+        Task<Hosts> GetHostByIdAsync(int id);
+        Task<bool> UpdateHostAsync(Hosts Hosts);
     }
 }

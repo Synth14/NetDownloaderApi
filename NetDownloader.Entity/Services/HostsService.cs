@@ -19,28 +19,31 @@ namespace NetDownloader.Entity.Services
             return await _context.HostItems.ToListAsync();
         }
 
-        public async Task<Hosts> GetHostsByIdAsync(int id)
+        public async Task<Hosts> GetHostByIdAsync(int id)
         {
             return await _context.HostItems.FirstOrDefaultAsync(m => m.HostId == id);
         }
 
-        public async Task CreateHostsAsync(Hosts Hosts)
+        public async Task<bool> CreateHostAsync(Hosts Hosts)
         {
             _context.Add(Hosts);
-            await _context.SaveChangesAsync();
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
         }
 
-        public async Task UpdateHostsAsync(Hosts Hosts)
+        public async Task<bool> UpdateHostAsync(Hosts Hosts)
         {
             _context.Update(Hosts);
-            await _context.SaveChangesAsync();
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
         }
 
-        public async Task DeleteHostsAsync(int id)
+        public async Task<bool> DeleteHostByIdAsync(int id)
         {
             var Hosts = await _context.HostItems.FindAsync(id);
             _context.HostItems.Remove(Hosts);
-            await _context.SaveChangesAsync();
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
         }
     }
 }
