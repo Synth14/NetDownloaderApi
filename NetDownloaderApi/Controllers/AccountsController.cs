@@ -33,7 +33,7 @@ namespace NetDownloader.Entity.Controllers
             return Ok(allTags);
         }
         [ApiVersion("1")]
-        [HttpPatch("UpdateAccount")]
+        [HttpPut("UpdateAccount")]
         [SwaggerOperation(Summary = "Update an account", Description = "Update an account")]
         public async Task<IActionResult> UpdateAccount(Accounts account)
         {

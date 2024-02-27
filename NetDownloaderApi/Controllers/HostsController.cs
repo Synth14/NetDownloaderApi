@@ -32,7 +32,7 @@ namespace NetDownloader.Entity.Controllers
             return Ok(allTags);
         }
         [ApiVersion("1")]
-        [HttpPatch("UpdateHost")]
+        [HttpPut("UpdateHost")]
         [SwaggerOperation(Summary = "UpdateHost", Description = "UpdateHost")]
         public async Task<IActionResult> UpdateHost(Hosts host)
         {

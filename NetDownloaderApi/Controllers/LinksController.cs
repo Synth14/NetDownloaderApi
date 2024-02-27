@@ -32,7 +32,7 @@ namespace NetDownloader.Entity.Controllers
             return Ok(allTags);
         }
         [ApiVersion("1")]
-        [HttpPatch("Updatelink")]
+        [HttpPut("Updatelink")]
         [SwaggerOperation(Summary = "Update a link", Description = "Update a link")]
         public async Task<IActionResult> UpdateLink(Links link)
         {
